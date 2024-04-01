@@ -35,6 +35,14 @@ class BaseVegetation():
         self.debug = self.config['leave_intermediate_files']
         self.temp_dir = os.path.join(self.config['output_folder'], 'temp')
 
+        self.cell_size = self.config['cell_size']
+        self.veg_height_resample = self.config[
+            'vegetation_height_resample_method'
+        ]
+        self.veg_type_resample = self.config[
+            'vegetation_type_resample_method'
+        ]
+
     @property
     def veg_type_image(self):
         return os.path.join(
@@ -63,15 +71,12 @@ class BaseVegetation():
             'veg_height': os.path.join(self.temp_dir, 'clipped_veg_height.tif')
         }
 
-    def reproject(self, extents, cell_size, target_crs) -> None:
+    def reproject(self, extents, target_crs) -> None:
         """reproject vegetation datasets to the desired extents.
 
         Args:
             extents (list): Extents to crop to [left, bottom, right, top]
-            cell_size (float): cell size to resample to
             target_crs (str): EPSG code, i.e. EPSG:32611
-            resample (str, optional): resampling method for veg height
-                Defaults to 'bilinear'.
         """
 
         self._logger.debug(
@@ -83,8 +88,8 @@ class BaseVegetation():
             self.clipped_images['veg_type'],
             target_crs,
             extents,
-            cell_size,
-            resample='mode',
+            self.cell_size,
+            resample=self.veg_type_resample,
             logger=self._logger
         )
 
@@ -94,8 +99,8 @@ class BaseVegetation():
             self.clipped_images['veg_height'],
             target_crs,
             extents,
-            cell_size,
-            resample='mode',
+            self.cell_size,
+            resample=self.veg_height_resample,
             logger=self._logger
         )
 

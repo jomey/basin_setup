@@ -140,7 +140,7 @@ class GenerateTopo():
             elif self.config['vegetation_dataset'] == 'landfire_2.0.0':
                 veg = vegetation.Landfire200(self.config)
 
-            veg.reproject(self.extents, self.cell_size, self.crs)
+            veg.reproject(self.extents, self.cell_size)
             veg.load_clipped_images()
             veg.calculate_tau_and_k()
             veg.calculate_height()

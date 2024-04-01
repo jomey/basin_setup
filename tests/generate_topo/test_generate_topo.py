@@ -8,7 +8,7 @@ from rasterio import Affine
 from basin_setup.generate_topo import GenerateTopo
 from basin_setup.generate_topo.shapefile import Shapefile
 from basin_setup.generate_topo.vegetation import Landfire140
-from basin_setup.utils import domain_extent
+from basin_setup.utils import domain_extent, gdal
 from tests.Lakes.lakes_test_case import BasinSetupLakes
 
 
@@ -71,7 +71,7 @@ class TestBasinSetup(BasinSetupLakes):
                               'y', 'x', 'spatial_ref'])
 
     @patch.object(Landfire140, 'reproject', return_value=True)
-    def test_load_vegetation(self, mock_veg):
+    def test_load_vegetation(self, _mock_veg):
         self.subject.crs = self.CRS
         self.subject.extents = self.EXTENTS
         self.subject.load_vegetation()
@@ -96,8 +96,49 @@ class TestBasinSetup(BasinSetupLakes):
             self.subject.veg.veg_height.dtype == np.float64
         )
 
+    @patch.object(gdal, 'gdalwarp', return_value=True)
+    def test_vegetation_resample_method_default(self, mock_veg):
+        self.subject.crs = self.CRS
+        self.subject.extents = self.EXTENTS
+        self.subject.load_vegetation()
+
+        self.assertEquals(mock_veg.call_count, 2)
+        # Call 1 to vegetation type
+        self.assertEquals(
+            mock_veg.mock_calls[0][2]['resample'],
+            'mode'
+        )
+        # Call 2 to vegetation height
+        self.assertEquals(
+            mock_veg.mock_calls[1][2]['resample'],
+            'mode'
+        )
+
+    @patch.object(gdal, 'gdalwarp', return_value=True)
+    def test_vegetation_resample_method_custom(self, mock_veg):
+        nearest_neighbor_resample = 'near'
+        self.subject.config['vegetation_type_resample_method'] = \
+            nearest_neighbor_resample
+        self.subject.config['vegetation_height_resample_method'] = \
+            nearest_neighbor_resample
+        self.subject.crs = self.CRS
+        self.subject.extents = self.EXTENTS
+        self.subject.load_vegetation()
+
+        self.assertEquals(mock_veg.call_count, 2)
+        # Call 1 to vegetation type
+        self.assertEquals(
+            mock_veg.mock_calls[0][2]['resample'],
+            nearest_neighbor_resample
+        )
+        # Call 2 to vegetation height
+        self.assertEquals(
+            mock_veg.mock_calls[1][2]['resample'],
+            nearest_neighbor_resample
+        )
+
     @patch.object(Landfire140, 'reproject', return_value=True)
-    def test_run(self, mock_veg):
+    def test_run(self, _mock_veg):
         gt = GenerateTopo(config_file=self.config_file)
         gt.run()
 
