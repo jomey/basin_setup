@@ -187,7 +187,7 @@ class BaseVegetation():
         # that any value that is not found in the csv file will have a
         # height of 0 meters. This will work most of the time except in
         # developed or agriculture but there isn't snow there anyways...
-        height = self.ds['veg_height'].copy() * 0
+        height = self.ds['veg_height'].astype(np.float64).copy() * 0
         veg_heights = np.unique(self.ds['veg_height'])
 
         for veg_height in veg_heights:

@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+import numpy as np
 import xarray as xr
 from inicheck.config import UserConfig
 from rasterio import Affine
@@ -9,6 +10,7 @@ from basin_setup.generate_topo.shapefile import Shapefile
 from basin_setup.generate_topo.vegetation import Landfire140
 from basin_setup.utils import domain_extent
 from tests.Lakes.lakes_test_case import BasinSetupLakes
+
 
 # patch the landfire datasets for testing. Comment out to test with the
 # real thing
@@ -88,6 +90,10 @@ class TestBasinSetup(BasinSetupLakes):
         self.assertCountEqual(
             list(self.subject.veg.veg_height.coords.keys()),
             ['y', 'x', 'spatial_ref']
+        )
+        # Keep heights as float data type for sub-meter classification
+        self.assertTrue(
+            self.subject.veg.veg_height.dtype == np.float64
         )
 
     @patch.object(Landfire140, 'reproject', return_value=True)
