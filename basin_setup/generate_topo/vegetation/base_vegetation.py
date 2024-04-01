@@ -176,7 +176,7 @@ class BaseVegetation():
 
         # match whole numbers and decimals in the line
         regex = re.compile(r"(?<!\*)(\d*\.?\d+)(?!\*)")
-        veg_df['height'] = 0  # see assumption below
+        veg_df['height'] = 0.0  # see assumption below
         for idx, row in veg_df.iterrows():
             matches = regex.findall(row.CLASSNAMES)
             if len(matches) > 0:
