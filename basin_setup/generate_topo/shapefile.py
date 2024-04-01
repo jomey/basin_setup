@@ -17,6 +17,10 @@ class Shapefile():
         """
         return self.polygon.crs.srs
 
+    @property
+    def utm_zone_number(self):
+        return int(self.polygon.crs.utm_zone.replace('N', ''))
+
     def mask(self, nx, ny, transform):
         """Create a raster mask from the shapefile using rasterio.features.rasterize
 

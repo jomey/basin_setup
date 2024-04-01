@@ -183,6 +183,8 @@ class GenerateTopo():
         # The shapefile are the basis for the projection
         # Also change to projection to keep in line with other topo.nc files
         output['projection'] = mask['spatial_ref']
+        output['projection'].attrs['utm_zone_number'] = \
+            self.basin_shapefiles[0].utm_zone_number
         del output['spatial_ref']
 
         # set attributes for x/y dimensions
