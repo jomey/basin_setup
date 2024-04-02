@@ -54,7 +54,10 @@ class TestBasinSetup(BasinSetupLakes):
 
         self.assertTrue(len(self.subject.basin_shapefiles) == 1)
         self.assertIsInstance(self.subject.basin_shapefiles[0], Shapefile)
-        self.assertEqual(self.subject.basin_shapefiles[0].crs, self.CRS)
+        self.assertEqual(
+            self.subject.basin_shapefiles[0].crs.lower(),
+            self.CRS.lower()
+        )
 
     def test_load_dem(self):
         self.subject.crs = self.CRS
