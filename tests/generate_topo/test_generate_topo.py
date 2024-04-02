@@ -102,14 +102,14 @@ class TestBasinSetup(BasinSetupLakes):
         self.subject.extents = self.EXTENTS
         self.subject.load_vegetation()
 
-        self.assertEquals(mock_veg.call_count, 2)
+        self.assertEqual(mock_veg.call_count, 2)
         # Call 1 to vegetation type
-        self.assertEquals(
+        self.assertEqual(
             mock_veg.mock_calls[0][2]['resample'],
             'mode'
         )
         # Call 2 to vegetation height
-        self.assertEquals(
+        self.assertEqual(
             mock_veg.mock_calls[1][2]['resample'],
             'mode'
         )
@@ -125,14 +125,14 @@ class TestBasinSetup(BasinSetupLakes):
         self.subject.extents = self.EXTENTS
         self.subject.load_vegetation()
 
-        self.assertEquals(mock_veg.call_count, 2)
+        self.assertEqual(mock_veg.call_count, 2)
         # Call 1 to vegetation type
-        self.assertEquals(
+        self.assertEqual(
             mock_veg.mock_calls[0][2]['resample'],
             nearest_neighbor_resample
         )
         # Call 2 to vegetation height
-        self.assertEquals(
+        self.assertEqual(
             mock_veg.mock_calls[1][2]['resample'],
             nearest_neighbor_resample
         )
