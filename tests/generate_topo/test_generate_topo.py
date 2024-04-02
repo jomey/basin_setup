@@ -3,6 +3,7 @@ from unittest.mock import patch
 import numpy as np
 import xarray as xr
 from inicheck.config import UserConfig
+from numpy import testing as np_test
 from rasterio import Affine
 
 from basin_setup.generate_topo import GenerateTopo
@@ -74,16 +75,25 @@ class TestBasinSetup(BasinSetupLakes):
                               'y', 'x', 'spatial_ref'])
 
     @patch.object(Landfire140, 'reproject', return_value=True)
-    def test_load_vegetation(self, _mock_veg):
+    def test_load_vegetation(self, mock_veg):
         self.subject.crs = self.CRS
         self.subject.extents = self.EXTENTS
         self.subject.load_vegetation()
 
         extents, cell_size = domain_extent.parse_from_file(
-            self.subject.veg.clipped_images['veg_type'])
+            self.subject.veg.clipped_images['veg_type']
+        )
 
         self.assertListEqual(extents, self.EXTENTS_RASTER)
         self.assertTrue(cell_size == self.subject.config['cell_size'])
+
+        # TODO: Improve decimal precision
+        np_test.assert_almost_equal(
+            mock_veg.mock_calls[0][1][0],
+            self.EXTENTS_RASTER,
+            decimal=3,
+        )
+        self.assertEqual(mock_veg.mock_calls[0][1][1], self.CRS)
 
         self.assertIsInstance(self.subject.veg, Landfire140)
         self.assertCountEqual(
