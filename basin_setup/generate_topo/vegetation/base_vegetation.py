@@ -176,28 +176,40 @@ class BaseVegetation():
 
         self._logger.debug('Calculating veg height')
 
-        veg_df = pd.read_csv(self.veg_height_csv)
-        veg_df.set_index('VALUE', inplace=True)
+        veg_csv = pd.read_csv(self.veg_height_csv)
+        veg_csv.set_index('VALUE', inplace=True)
 
         # match whole numbers and decimals in the line
         regex = re.compile(r"(?<!\*)(\d*\.?\d+)(?!\*)")
-        veg_df['height'] = 0.0  # see assumption below
-        for idx, row in veg_df.iterrows():
+        veg_csv['height'] = 0.0  # see assumption below
+        for idx, row in veg_csv.iterrows():
             matches = regex.findall(row.CLASSNAMES)
             if len(matches) > 0:
-                veg_df.loc[idx, 'height'] = np.mean(
-                    np.array([float(x) for x in matches]))
+                veg_csv.loc[idx, 'height'] = np.mean(
+                    np.array([float(x) for x in matches])
+                )
 
         # create an image that is full of 0 values. This makes the assumption
         # that any value that is not found in the csv file will have a
         # height of 0 meters. This will work most of the time except in
         # developed or agriculture but there isn't snow there anyways...
         height = self.ds['veg_height'].astype(np.float64).copy() * 0
-        veg_heights = np.unique(self.ds['veg_height'])
+        topo_veg_heights_class = np.unique(self.ds['veg_height'])
 
-        for veg_height in veg_heights:
-            idx = self.ds['veg_height'].values == veg_height
-            height.values[idx] = veg_df.loc[veg_height, 'height']
+        print_warning = 1
+        for veg_height_class in topo_veg_heights_class:
+            try:
+                idx = self.ds['veg_height'].values == veg_height_class
+                height.values[idx] = veg_csv.loc[veg_height_class, 'height']
+            except:
+                if print_warning:
+                    print('** WARNING **\n'
+                          '  An unknown vegetation height class was found. \n'
+                          '  This could be cause by using the wrong vegetation'
+                          'height resample algorithm.'
+                    )
+                    print_warning = 0
+
 
         # sanity check
         assert np.sum(np.isnan(height.values)) == 0
