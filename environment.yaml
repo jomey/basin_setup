@@ -1,0 +1,15 @@
+name: basin_setup
+channels:
+- conda-forge
+dependencies:
+- colorama
+- coloredlogs
+- geopandas
+- netcdf4
+- numpy[version='<1.25']
+- pandas
+- pip
+- python
+- rioxarray
+- xarray
+
