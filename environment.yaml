@@ -1,4 +1,4 @@
-name: basin_setup
+name: bs2
 channels:
 - conda-forge
 dependencies:
@@ -11,5 +11,9 @@ dependencies:
 - pip
 - python
 - rioxarray
+- setuptools_scm
 - xarray
+pip:
+  - spatialnc
+  - inicheck
 
